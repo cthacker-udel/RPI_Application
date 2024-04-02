@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Temperature Display</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery library for AJAX -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+      /* CSS code for styling the navbar */
+      .navbar {
+        background-color: #f0f0f0; /* Gray background color */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Good border shadows */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+      }
+
+      .brand {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333; /* Black text color */
+      }
+
+      .links {
+        display: flex;
+        gap: 20px;
+      }
+
+      .links a {
+        text-decoration: none;
+        color: #333; /* Black text color */
+        transition: color 0.3s ease; /* Smooth color transition on hover */
+      }
+
+      .links a:hover {
+        color: #007bff; /* Change color on hover (e.g., blue) */
+      }
+
+      .container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #f0f0f0;
+        width: 100vw;
+      }
+      .chart-container {
+        width: 80%;
+        max-width: 800px;
+        height: 80%;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      h1 {
+        text-align: center;
+        color: #333333;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="brand">RPI</div>
+      <div class="links">
+        <a href="#">About Us</a>
+        <a href="#">Data</a>
+        <a href="#">Credits</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div id="scatter-chart"></div>
+    </div>
+
+    <script>
+      function updateChart() {
+        $.get("/temperature_data", function (response) {
+          console.log(response); // Log the response from the server
+          var data = response.data;
+          const xValues = data.map((entry) => entry.timestamp);
+          const yValuesCelsius = data.map((entry) => entry.celsius);
+          const yValuesFahrenheit = data.map((entry) => entry.fahrenheit);
+          const traceCelsius = {
+            x: xValues,
+            y: yValuesCelsius,
+            mode: "lines+markers",
+            name: "Temperature (Celsius)",
+          };
+
+          const traceFahrenheit = {
+            x: xValues,
+            y: yValuesFahrenheit,
+            mode: "lines+markers",
+            name: "Temperature (Fahrenheit)",
+          };
+
+          // Create the layout
+          const layout = {
+            title: "Temperature Data",
+            xaxis: { title: "Time Recorded", tickformat: "%m-%d %H:%M:%S" },
+            yaxis: { title: "Temperature" },
+            autosize: false,
+            width: 1100,
+            height: 700,
+          };
+
+          // Create the plot
+          Plotly.newPlot(
+            "scatter-chart",
+            [traceCelsius, traceFahrenheit],
+            layout
+          );
+        });
+      }
+
+      updateChart(); // Initial update
+      setInterval(updateChart, 6000); // Update chart every minute
+    </script>
+  </body>
+</html>
