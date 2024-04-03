@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from redis import Redis
+from temp_json_payload import TemperaturePayload
 
 load_dotenv()
 
@@ -34,6 +35,12 @@ def index() -> str:
     return render_template('index.html', data=formatted_data)
 
 
+@app.route('/pi-ids', methods=['GET'])
+def get_pi_ids_route() -> str:
+    response = [x.decode('utf-8') for x in list(get_pi_ids_from_set())]
+    return jsonify(response)
+
+
 @app.route('/update_temperature', methods=['POST'])
 def update_temperature() -> str:
     """
@@ -59,6 +66,8 @@ def update_temperature() -> str:
                 'timestamp': timestamp_datetime.strftime('%Y-%m-%d %H:%M:%S')
             }
             store_temperature_data_to_redis(temperature_payload)
+            if not is_pi_id_in_set(pi_id):
+                add_pi_id_to_set(pi_id)
             return "Temperature updated successfully"
 
         return "Invalid temperature data"
@@ -98,16 +107,18 @@ def celsius_to_fahrenheit(celsius):
     return celsius * 9/5 + 32
 
 
-def store_temperature_data_to_redis(data):
+def store_temperature_data_to_redis(data: TemperaturePayload):
     """
     Store temperature data to Redis.
 
     Args:
         data (Dict[str, Any]): Temperature data to store.
     """
-    if not redis_conn.exists('temperature_data'):
-        redis_conn.expire('temperature_data', 3600)
-    redis_conn.lpush('temperature_data', json.dumps(data))
+    classed_data = TemperaturePayload(**data)
+    collection_str = f'temperature_data_{classed_data.pi_id}'
+    if not redis_conn.exists(collection_str):
+        redis_conn.expire(collection_str, 3600)
+    redis_conn.lpush(collection_str, json.dumps(data))
 
 
 def get_temperature_data_from_redis():
@@ -126,6 +137,34 @@ def get_temperature_data_from_redis():
             data['timestamp'], '%Y-%m-%d %H:%M:%S')
         temperature_data.append(data)
     return temperature_data
+
+
+def add_pi_id_to_set(pi_id):
+    # Add the Pi ID to the Redis Set
+    redis_conn.sadd('pi_ids', pi_id)
+
+
+def get_pi_ids_from_set():
+    # Retrieve all Pi IDs from the Redis Set
+    return redis_conn.smembers('pi_ids')
+
+
+def remove_pi_id_from_set(pi_id):
+    # Remove the Pi ID from the Redis Set
+    redis_conn.srem('pi_ids', pi_id)
+
+
+def is_pi_id_in_set(pi_id):
+    """
+    Check if a Pi ID is already in the set.
+
+    Args:
+        pi_id (str): The Pi ID to check.
+
+    Returns:
+        bool: True if the Pi ID is in the set, False otherwise.
+    """
+    return redis_conn.sismember('pi_ids', pi_id)
 
 
 if __name__ == '__main__':
