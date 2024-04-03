@@ -44,12 +44,18 @@ def update_temperature() -> str:
     """
     data: Dict[str, Any] = request.json
     if data:
+        fahrenheit: float = data.get('fahrenheit')
         celsius: float = data.get('celsius')
+        kelvin: float = data.get('kelvin')
+        pi_id: str = data.get('pi_id')
         timestamp: datetime = data.get('timestamp')
         if celsius is not None:
             timestamp_datetime: datetime = datetime.fromtimestamp(timestamp)
             temperature_payload: Dict[str, Any] = {
                 'celsius': celsius,
+                'fahrenheit': fahrenheit,
+                'kelvin': kelvin,
+                'pi_id': pi_id,
                 'timestamp': timestamp_datetime.strftime('%Y-%m-%d %H:%M:%S')
             }
             store_temperature_data_to_redis(temperature_payload)
@@ -68,10 +74,13 @@ def get_temperature_data():
         str: JSON response containing the temperature data.
     """
     temperature_data: List[Dict[str, Any]] = get_temperature_data_from_redis()
-    formatted_data: List[Dict[str, Any]] = [{'timestamp': data['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
-                                             'celsius': data['celsius'],
-                                             'fahrenheit': celsius_to_fahrenheit(data['celsius'])}
-                                            for data in temperature_data]
+    formatted_data: List[Dict[str, Any]] = [{
+        'timestamp': data['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
+        'celsius': data['celsius'],
+        'kelvin': data['kelvin'],
+        'pi_id': data['pi_id'],
+        'fahrenheit': celsius_to_fahrenheit(data['celsius'])}
+        for data in temperature_data]
 
     return jsonify({'data': formatted_data})
 

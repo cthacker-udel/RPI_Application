@@ -53,9 +53,16 @@
       function updateChart() {
         $.get("/temperature_data", function (response) {
           var data = response.data;
+
+          // Extracting x-axis values (timestamps)
           const xValues = data.map((entry) => entry.timestamp);
+
+          // Extracting y-axis values for Celsius, Fahrenheit, and Kelvin
           const yValuesCelsius = data.map((entry) => entry.celsius);
           const yValuesFahrenheit = data.map((entry) => entry.fahrenheit);
+          const yValuesKelvin = data.map((entry) => entry.kelvin);
+
+          // Define traces for Celsius, Fahrenheit, and Kelvin
           const traceCelsius = {
             x: xValues,
             y: yValuesCelsius,
@@ -70,20 +77,33 @@
             name: "Temperature (Fahrenheit)",
           };
 
+          const traceKelvin = {
+            x: xValues,
+            y: yValuesKelvin,
+            mode: "lines+markers",
+            name: "Temperature (Kelvin)",
+          };
+
           // Create the layout
           const layout = {
-            title: "Temperature Data",
-            xaxis: { title: "Time Recorded", tickformat: "%m-%d %H:%M:%S" },
+            title: "Paver Temperature Readings",
+            xaxis: { title: "Time Recorded", tickformat: "%m/%d %I:%M %p" },
             yaxis: { title: "Temperature" },
+            margin: {
+              l: 100,
+              r: 100,
+              t: 100,
+              b: 100,
+            },
             autosize: false,
-            width: 1100,
-            height: 700,
+            width: 1700,
+            height: 850,
           };
 
           // Create the plot
           Plotly.newPlot(
             "scatter-chart",
-            [traceCelsius, traceFahrenheit],
+            [traceCelsius, traceFahrenheit, traceKelvin],
             layout
           );
         });
