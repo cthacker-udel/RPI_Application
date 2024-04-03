@@ -3,14 +3,29 @@ import os
 from datetime import datetime
 from typing import Any, Dict, List
 
+import nh3
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
+from jsonschema import ValidationError, validate
 from redis import Redis
+
 from temp_json_payload import TemperaturePayload
 
 load_dotenv()
 
 app = Flask(__name__)
+
+schema = {
+    'type': 'object',
+    'properties': {
+        'celsius': {'type': 'number'},
+        'fahrenheit': {'type': 'number'},
+        'kelvin': {'type': 'number'},
+        'pi_id': {'type': 'string'},
+        'timestamp': {'type': 'number'}
+    },
+    'required': ['celsius', 'fahrenheit', 'kelvin', 'pi_id', 'timestamp']
+}
 
 REDIS_HOST = os.getenv("REDIS_HOST")
 REDIS_PORT = os.getenv("REDIS_PORT")
@@ -45,12 +60,19 @@ def update_temperature() -> str:
         str: Response indicating the success or failure of the update operation.
     """
     data: Dict[str, Any] = request.json
+
     if data:
         fahrenheit: float = data.get('fahrenheit')
         celsius: float = data.get('celsius')
         kelvin: float = data.get('kelvin')
-        pi_id: str = data.get('pi_id')
+        pi_id: str = nh3.clean(data.get('pi_id'))
         timestamp: datetime = data.get('timestamp')
+
+        try:
+            validate(instance=data, schema=schema)
+        except ValidationError as error:
+            return jsonify({'error': error.message}), 400
+
         if celsius is not None:
             timestamp_datetime: datetime = datetime.fromtimestamp(timestamp)
             temperature_payload: Dict[str, Any] = {
@@ -77,7 +99,7 @@ def get_temperature_data():
     Returns:
         str: JSON response containing the temperature data.
     """
-    pi_id = request.args.get('pi_id')
+    pi_id = nh3.clean(request.args.get('pi_id'))
 
     if not pi_id:
         return jsonify({'error': 'Pi ID is required'})
