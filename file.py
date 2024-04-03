@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, jsonify
-from datetime import datetime
-from dotenv import load_dotenv
-import os
-from redis import Redis
 import json
-from typing import List, Dict, Any
+import os
+from datetime import datetime
+from typing import Any, Dict, List
+
+from dotenv import load_dotenv
+from flask import Flask, jsonify, render_template, request
+from redis import Redis
 
 load_dotenv()
 
