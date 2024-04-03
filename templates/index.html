@@ -69,6 +69,13 @@
             <div id="scatter-chart"></div>
         </div>
 
+        <div class="fs-3 mt-4 text-center" id="default-message">
+            <p>
+                Please select a Pi ID from the dropdown to view temperature
+                data.
+            </p>
+        </div>
+
         <script>
             function updateChart() {
                 const activeItem = document.querySelector(
@@ -177,6 +184,12 @@
                 );
 
                 if (selectedPiId !== null) {
+                    const defaultDisplayMessage =
+                        document.querySelector("#default-message");
+                    if (!defaultDisplayMessage.classList.contains("d-none")) {
+                        defaultDisplayMessage.classList.add("d-none");
+                    }
+
                     selectedPiId.classList.add("active");
                 }
             };
