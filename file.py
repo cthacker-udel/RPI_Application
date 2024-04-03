@@ -27,12 +27,7 @@ def index() -> str:
     Returns:
         HTML: The index.html with the template data injected
     """
-    temperature_data: List[Dict[str, Any]] = get_temperature_data_from_redis()
-    formatted_data: List[Dict[str, Any]] = [{'timestamp': data['timestamp'].strftime('%m-%d %H:%M:%S'),
-                                             'celsius': data['celsius'],
-                                             'fahrenheit': celsius_to_fahrenheit(data['celsius'])}
-                                            for data in temperature_data]
-    return render_template('index.html', data=formatted_data)
+    return render_template('index.html')
 
 
 @app.route('/pi-ids', methods=['GET'])
