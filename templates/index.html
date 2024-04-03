@@ -6,91 +6,52 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- jQuery library for AJAX -->
     <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
     />
-    <style>
-      body,
-      html {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-      }
-      /* CSS code for styling the navbar */
-      .navbar {
-        background-color: #f0f0f0; /* Gray background color */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Good border shadows */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
-      }
-
-      .brand {
-        font-size: 18px;
-        font-weight: bold;
-        color: #333; /* Black text color */
-      }
-
-      .links {
-        display: flex;
-        gap: 20px;
-      }
-
-      .links a {
-        text-decoration: none;
-        color: #333; /* Black text color */
-        transition: color 0.3s ease; /* Smooth color transition on hover */
-      }
-
-      .links a:hover {
-        color: #007bff; /* Change color on hover (e.g., blue) */
-      }
-
-      .container {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #f0f0f0;
-        width: 100vw;
-      }
-      .chart-container {
-        width: 80%;
-        max-width: 800px;
-        height: 80%;
-        background-color: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
-      h1 {
-        text-align: center;
-        color: #333333;
-        margin-top: 20px;
-      }
-    </style>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <style></style>
   </head>
-  <body>
-    <nav class="navbar">
-      <div class="brand">RPI</div>
-      <div class="links">
-        <a href="#">About Us</a>
-        <a href="#">Data</a>
-        <a href="#">Credits</a>
+  <body class="m-0 vw-100 max-vw-100">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            src="https://static.thenounproject.com/png/1109534-200.png"
+            width="45"
+            height="45"
+          />
+          Paver Project</a
+        >
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="#">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Data</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Authors</a>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <div class="container">
+    <div class="vw-100 d-flex flex-row justify-content-center">
       <div id="scatter-chart"></div>
     </div>
 
     <script>
       function updateChart() {
         $.get("/temperature_data", function (response) {
-          console.log(response); // Log the response from the server
           var data = response.data;
           const xValues = data.map((entry) => entry.timestamp);
           const yValuesCelsius = data.map((entry) => entry.celsius);
