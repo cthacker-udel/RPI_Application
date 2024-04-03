@@ -71,7 +71,19 @@
 
         <script>
             function updateChart() {
-                $.get("/temperature_data", function (response) {
+                const activeItem = document.querySelector(
+                    ".dropdown-item.active",
+                );
+                if (!activeItem) {
+                    // No active pi id selected, return without executing
+                    return;
+                }
+
+                const pi_id = activeItem.getAttribute("data-pi-id");
+
+                const url = `/temperature_data?pi_id=${pi_id}`;
+
+                $.get(url, function (response) {
                     var data = response.data;
 
                     // Extracting x-axis values (timestamps)

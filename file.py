@@ -82,7 +82,13 @@ def get_temperature_data():
     Returns:
         str: JSON response containing the temperature data.
     """
-    temperature_data: List[Dict[str, Any]] = get_temperature_data_from_redis()
+    pi_id = request.args.get('pi_id')
+
+    if not pi_id:
+        return jsonify({'error': 'Pi ID is required'})
+
+    temperature_data: List[Dict[str, Any]
+                           ] = get_temperature_data_from_redis(pi_id)
     formatted_data: List[Dict[str, Any]] = [{
         'timestamp': data['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
         'celsius': data['celsius'],
@@ -121,7 +127,7 @@ def store_temperature_data_to_redis(data: TemperaturePayload):
     redis_conn.lpush(collection_str, json.dumps(data))
 
 
-def get_temperature_data_from_redis():
+def get_temperature_data_from_redis(pi_id):
     """
     Retrieve temperature data from Redis.
 
@@ -130,7 +136,7 @@ def get_temperature_data_from_redis():
     """
     temperature_data: List[Dict[str, Any]] = []
     temperature_data_strings: List[str] = redis_conn.lrange(
-        'temperature_data', 0, -1)
+        f'temperature_data_{pi_id}', 0, -1)
     for data_str in temperature_data_strings:
         data: Dict[str, Any] = json.loads(data_str)
         data['timestamp'] = datetime.strptime(
