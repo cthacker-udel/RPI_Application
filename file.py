@@ -4,11 +4,11 @@ from datetime import datetime
 from typing import Any, Dict, List
 
 import nh3
+import sqlalchemy
+from sqlalchemy.ext.declarative import declarative_base
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from jsonschema import ValidationError, validate
-from redis import Redis
-
 from temp_json_payload import TemperaturePayload
 
 load_dotenv()
@@ -27,11 +27,26 @@ schema = {
     'required': ['celsius', 'fahrenheit', 'kelvin', 'pi_id', 'timestamp']
 }
 
-REDIS_HOST = os.getenv("REDIS_HOST")
-REDIS_PORT = os.getenv("REDIS_PORT")
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+READ_USER = os.getenv("PAVER_READ_ACCOUNT_NAME")
+READ_PASS = os.getenv("PAVER_READ_ACCOUNT_PASSWORD")
+DB_HOST = os.getenv("PAVER_DB_HOST")
 
-redis_conn = Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD)
+engine = sqlalchemy.create_engine(
+    f"mariadb+mariadbconnector://{READ_USER}:{READ_PASS}@{DB_HOST}/company")
+Base = declarative_base()
+
+
+class Temperature(Base):
+    __tablename__ = "temperature"
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    celsius = sqlalchemy.Column(sqlalchemy.Float(5), nullable=False)
+    fahrenheit = sqlalchemy.Column(sqlalchemy.Float(5), nullable=False)
+    kelvin = sqlalchemy.Column(sqlalchemy.Float(5), nullable=False)
+    timestamp = sqlalchemy.Column(sqlalchemy.Integer(), nullable=False)
+    pi_id = sqlalchemy.Column(sqlalchemy.ForeignKey("ids.pi_id"))
+
+
+Base.metadata.create_all(engine)
 
 
 @app.route('/')
