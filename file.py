@@ -7,10 +7,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine, make_url
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 load_dotenv()
 
 app = Flask(__name__)
+# CORS(app, resources={r'/api/*': {'origins': 'rgca.engr.udel.edu'}})
 
 DB_USERNAME_ENV = "LOCAL_DB_USERNAME"  # "PAVER_READ_USERNAME"
 DB_PASSWORD_ENV = "LOCAL_DB_PASSWORD"  # "PAVER_READ_PASSWORD"
@@ -44,7 +46,7 @@ class Temperature(Base):
     celsius = Column(Float(5), nullable=False)
     fahrenheit = Column(Float(5), nullable=False)
     kelvin = Column(Float(5), nullable=False)
-    timestamp = Column(Integer(), nullable=False)
+    temperature_timestamp = Column(Integer(), nullable=False)
     pi_id = Column(String(6), ForeignKey("ids.pi_id"))
     pi = relationship("Id", back_populates="temperatures")
 
@@ -57,7 +59,7 @@ def index() -> str:
     return render_template('index.html')
 
 
-@app.route('/pi-ids', methods=['GET'])
+@app.route('/api/pi-ids', methods=['GET'])
 def get_pi_ids_route() -> str:
     session = Session()
     pi_ids = [id.pi_id for id in session.query(Id).all()]
@@ -65,7 +67,7 @@ def get_pi_ids_route() -> str:
     return jsonify(pi_ids)
 
 
-@app.route('/temperature_data', methods=['GET'])
+@app.route('/api/temperature_data', methods=['GET'])
 def get_temperature_data():
     pi_id = nh3.clean(request.args.get('pi_id'))
 
@@ -78,7 +80,7 @@ def get_temperature_data():
     session.close()
 
     formatted_data = [{
-        'timestamp': temp.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        'timestamp': temp.temperature_timestamp.strftime('%Y-%m-%d %H:%M:%S'),
         'celsius': temp.celsius,
         'kelvin': temp.kelvin,
         'pi_id': temp.pi_id,
@@ -88,17 +90,9 @@ def get_temperature_data():
     return jsonify({'data': formatted_data})
 
 
-def get_pi_ids_from_set():
-    session = Session()
-    pi_ids = [id_instance.pi_id for id_instance in session.query(Id).all()]
-    session.close()
-    print(pi_ids)
-    return pi_ids
-
-
 def celsius_to_fahrenheit(celsius):
     return celsius * 9/5 + 32
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=8000)
+    app.run(host='0.0.0.0', port=8000)

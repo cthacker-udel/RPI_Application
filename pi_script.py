@@ -51,7 +51,7 @@ class Temperature(Base):
     celsius = Column(Float(5), nullable=False)
     fahrenheit = Column(Float(5), nullable=False)
     kelvin = Column(Float(5), nullable=False)
-    timestamp = Column(Integer(), nullable=False)
+    temperature_timestamp = Column(Integer(), nullable=False)
     pi_id = Column(String(6), ForeignKey("ids.pi_id"))
     pi = relationship("Id", back_populates="temperatures")
 
@@ -117,7 +117,7 @@ def add_temp(temperature_data):
     [celsius, fahrenheit, kelvin] = temperature_data
     with Session() as session:
         temp_record = Temperature(
-            celsius=celsius, fahrenheit=fahrenheit, kelvin=kelvin, timestamp=datetime.now())
+            celsius=celsius, fahrenheit=fahrenheit, kelvin=kelvin, temperature_timestamp=datetime.now())
         session.add(temp_record)
 
 
