@@ -2,69 +2,58 @@
 # RUN ON PI
 # SPDX-License-Identifier: MIT
 
-from sqlalchemy.orm import (DeclarativeBase, Mapped, Session, mapped_column,
-                            relationship)
-from sqlalchemy import Float, ForeignKey, Integer, String, create_engine
+from sqlalchemy.orm import Session, relationship
+from sqlalchemy import create_engine, make_url, Column, Float, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 import shortuuid
 import argparse
 import glob
 import time
 from datetime import datetime
-from typing import List
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
+DB_USERNAME_ENV = "LOCAL_DB_USERNAME"  # "PAVER_WRITE_USERNAME"
+DB_PASSWORD_ENV = "LOCAL_DB_PASSWORD"  # "PAVER_WRITE_PASSWORDS"
+DB_HOST_ENV = "LOCAL_DB_HOST"  # "PAVER_DB_HOST"
+DB_TABLE_ENV = "LOCAL_DB_TABLE"  # "PAVER_DB_TABLE"
+
+WRITE_USER = os.getenv(DB_USERNAME_ENV)
+WRITE_PASS = os.getenv(DB_PASSWORD_ENV)
+DB_HOST = os.getenv(DB_HOST_ENV)
+DB_TABLE = os.getenv(DB_TABLE_ENV)
 
 parser = argparse.ArgumentParser(
     description='Run the temperature script, sending data to be displayed on the research website.')
 parser.add_argument('name', metavar='N', type=str, help='The name of the PI')
 
+url = make_url(
+    f"mariadb+mariadbconnector://{WRITE_USER}:{WRITE_PASS}@{DB_HOST}:3306/{DB_TABLE}")
 engine = create_engine(
     os.getenv('MY_SQL_CONNECTION_STRING'), echo=True)
 
+Base = declarative_base()
 
-class Base(DeclarativeBase):
-    pass
+
+class Id(Base):
+    __tablename__ = 'ids'
+    id = Column(Integer, primary_key=True)
+    pi_id = Column(String(6), unique=True)
+    name = Column(String(10))
+    temperatures = relationship('Temperature', back_populates='pi')
 
 
 class Temperature(Base):
-    __tablename__ = 'temperature'
-
-    # PK
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    # celsius of the temperature
-    celsius: Mapped[float] = mapped_column(Float(5))
-
-    # fahrenheit of the temperature
-    fahrenheit: Mapped[float] = mapped_column(Float(5))
-
-    # kelvin of the temperature
-    kelvin: Mapped[float] = mapped_column(Float(5))
-
-    # the timestamp of when the temperature was added
-    timestamp: Mapped[Integer] = mapped_column(Integer())
-
-    # id of the pi adding the temperature
-    pi_id: Mapped[String] = mapped_column(ForeignKey('ids.pi_id'))
-
-
-class Ids(Base):
-    __tablename__ = 'ids'
-
-    # PK
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    # the id of the pi
-    pi_id: Mapped[String] = mapped_column(String(10), unique=True)
-
-    # the name of the pi
-    name: Mapped[String] = mapped_column(String(10))
-
-    # all of the temperatures belonging to the pi with the id
-    temperatures: Mapped[List["Temperature"]] = relationship()
+    __tablename__ = "temperatures"
+    id = Column(Integer, primary_key=True)
+    celsius = Column(Float(5), nullable=False)
+    fahrenheit = Column(Float(5), nullable=False)
+    kelvin = Column(Float(5), nullable=False)
+    timestamp = Column(Integer(), nullable=False)
+    pi_id = Column(String(6), ForeignKey("ids.pi_id"))
+    pi = relationship("Id", back_populates="temperatures")
 
 
 # Accessing temperature device, from website
@@ -124,11 +113,12 @@ def read_temp():
         return temp_c, temp_f, temp_k
 
 
-def send_temp(temperature_data):
+def add_temp(temperature_data):
     [celsius, fahrenheit, kelvin] = temperature_data
-    with Session(engine) as session:
+    with Session() as session:
         temp_record = Temperature(
             celsius=celsius, fahrenheit=fahrenheit, kelvin=kelvin, timestamp=datetime.now())
+        session.add(temp_record)
 
 
 while True:

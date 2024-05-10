@@ -12,18 +12,6 @@ load_dotenv()
 
 app = Flask(__name__)
 
-schema = {
-    'type': 'object',
-    'properties': {
-        'celsius': {'type': 'number'},
-        'fahrenheit': {'type': 'number'},
-        'kelvin': {'type': 'number'},
-        'pi_id': {'type': 'string'},
-        'timestamp': {'type': 'number'}
-    },
-    'required': ['celsius', 'fahrenheit', 'kelvin', 'pi_id', 'timestamp']
-}
-
 DB_USERNAME_ENV = "LOCAL_DB_USERNAME"  # "PAVER_READ_USERNAME"
 DB_PASSWORD_ENV = "LOCAL_DB_PASSWORD"  # "PAVER_READ_PASSWORD"
 DB_HOST_ENV = "LOCAL_DB_HOST"  # "PAVER_DB_HOST"
