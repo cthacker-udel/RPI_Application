@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Temperature Display</title>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- jQuery library for AJAX -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous"
+        />
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"
+        ></script>
+        <style></style>
+    </head>
+    <body class="m-0 vw-100 max-vw-100">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                    <img
+                        alt="Pave Project Display Image"
+                        src="https://static.thenounproject.com/png/1109534-200.png"
+                        width="45"
+                        height="45"
+                    />
+                    Paver Project</a
+                >
+                <div class="collapse navbar-collapse">
+                    <ul
+                        class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center"
+                    >
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold" href="/details">
+                                Details
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="https://www.ecoplasticproducts.org/"
+                                target="_blank"
+                            >
+                                ECOP
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="https://www.tmsinternational.com/Services/SlagAggregates"
+                                target="_blank"
+                            >
+                                TMS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link"
+                                href="https://interlockpaving.com"
+                                target="_blank"
+                            >
+                                Interlock
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div
+            class="fs-3 mt-4 text-center d-flex flex-column p-3 m-3 rounded border justify-content-around gap-3 bg-gradient bg-dark-subtle"
+            id="default-message"
+        >
+            <div class="d-flex flex-column">
+                <h2>What is the sensor reading?</h2>
+                <p class="fs-6">
+                    The sensors are recording various weather conditions such as
+                    the temperature beneath (ground level) and inside of the
+                    concrete pavers, and compared to the ambient air
+                    temperature. Can you see the differences displayed in the
+                    plots below? Relative humidity is also being recorded using
+                    a weather station attached to the signage, and noted in the
+                    plots.
+                </p>
+            </div>
+        </div>
+        <div
+            class="fs-3 mt-4 text-center d-flex flex-column p-3 m-3 rounded border justify-content-around gap-3 bg-gradient bg-dark-subtle"
+            id="default-message"
+        >
+            <div class="d-flex flex-column">
+                <h2>Why are we monitoring the pavers?</h2>
+                <p class="fs-6">
+                    We are monitoring the effects of different weather
+                    conditions and load (i.e., pedestrian and vehicular traffic)
+                    on the durability and long-term performance of the concrete
+                    pavers embedded with recycled waste products that would
+                    otherwise be placed in landfills.
+                </p>
+                <div class="d-flex flex-row gap-3 justify-content-center">
+                    <img
+                        alt="Chart Depicting Paver Monitoring"
+                        height="400"
+                        src="static/chart1.png"
+                        width="500"
+                    />
+                    <img
+                        alt="Chart Depicting Paver Monitoring"
+                        height="400"
+                        src="static/chart1.png"
+                        width="500"
+                    />
+                </div>
+            </div>
+        </div>
+        <div
+            class="fs-3 mt-4 text-center d-flex flex-column p-3 m-3 rounded border justify-content-around gap-3 bg-gradient bg-dark-subtle"
+            id="default-message"
+        >
+            <div class="d-flex flex-column">
+                <h2 class="mb-5">Project Background and Acknowledgements</h2>
+                <p class="fs-6">
+                    There are more than 1000 lbs of plastics and recycled waste
+                    products in these pavers that would otherwise have been
+                    placed in landfills! This project was selected and partially
+                    funded by the University of Delaware Office of
+                    Sustainability (formerly Sustainability Council) as a 2022
+                    Green Grant award recipient. These efforts were led by
+                    <b>Kenneth "KJ" Olsen</b>, civil engineering undergraduate
+                    researcher who is now pursuing a Master of Civil Engineering
+                    (MCE) degree (expected May 2025). Professors
+                    <b>Monique Head</b> (Department of Civil Engineering) and
+                    <b>Suresh Advani</b> (Department of Mechanical Engineering
+                    and Center for Composite Materials) have been advising KJ
+                    and supporting the project efforts. Special thanks to
+                    <b>Cameron Thacker</b> for programming the interface to
+                    fetch the sensor data, Gary Wenczel, Structures &
+                    Geotechnical Lab Supervisor, and the following companies who
+                    supported this project:
+                </p>
+                <div class="d-flex flex-row gap-3 justify-content-center">
+                    <img
+                        alt="Chart Depicting Paver Monitoring"
+                        height="75"
+                        src="static/ecoplogo.png"
+                        width="150"
+                    />
+                    <img
+                        alt="Chart Depicting Paver Monitoring"
+                        height="75"
+                        src="static/tmslogo.png"
+                        width="150"
+                    />
+                    <img
+                        alt="Chart Depicting Paver Monitoring"
+                        height="75"
+                        src="static/interlocklogo.png"
+                        width="150"
+                    />
+                    <img
+                        alt="Chart Depicting Paver Monitoring"
+                        height="75"
+                        src="static/compositelogo.png"
+                        width="250"
+                    />
+                    <img
+                        alt="Chart Depicting Paver Monitoring"
+                        height="75"
+                        src="static/udcoelogo.png"
+                        width="250"
+                    />
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

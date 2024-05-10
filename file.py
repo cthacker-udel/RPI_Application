@@ -59,6 +59,11 @@ def index() -> str:
     return render_template('index.html')
 
 
+@app.route("/details")
+def background() -> str:
+    return render_template("details.html")
+
+
 @app.route('/api/pi-ids', methods=['GET'])
 def get_pi_ids_route() -> str:
     session = Session()
@@ -95,4 +100,4 @@ def celsius_to_fahrenheit(celsius):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', debug=True, port=8000)
